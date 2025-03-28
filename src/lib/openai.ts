@@ -1,56 +1,81 @@
 import OpenAI from 'openai'
 
+// Define document types
+export type DocumentType =
+  | 'Non-Disclosure Agreement'
+  | 'Employment Contract'
+  | 'Service Agreement'
+  | 'Privacy Policy'
+  | 'Terms of Service'
+
+// Initialize OpenAI client
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
 })
 
-export type BusinessDetails = {
-  businessName: string
-  businessType: 'Sole Proprietorship' | 'Partnership' | 'LLC' | 'Corporation'
-  industry: string
-  address: string
-  ownerName: string
-  contactEmail: string
-  contactPhone: string
-}
+// Base prompt template for document generation
+const basePrompt = `You are a legal document expert. Create a professional legal document of type {documentType} using the following details:
 
-const documentTypes = [
-  'Non-Disclosure Agreement',
-  'Employment Contract',
-  'Service Agreement',
-  'Privacy Policy',
-  'Terms of Service',
-] as const
+{formDetails}
 
-export type DocumentType = typeof documentTypes[number]
+Please generate a complete, legally sound document that includes:
+1. All necessary sections and clauses
+2. Proper legal terminology
+3. Clear and concise language
+4. Professional formatting
+5. Date and signature sections
+6. Applicable legal references and citations
+7. Industry-standard clauses and protections
 
-export async function generateDocument(documentType: DocumentType, businessDetails: BusinessDetails): Promise<string> {
-  const prompt = `Create a professional ${documentType} for a ${businessDetails.businessType} named "${businessDetails.businessName}" in the ${businessDetails.industry} industry.
-  
-Business Details:
-- Business Name: ${businessDetails.businessName}
-- Business Type: ${businessDetails.businessType}
-- Industry: ${businessDetails.industry}
-- Address: ${businessDetails.address}
-- Owner Name: ${businessDetails.ownerName}
-- Contact Email: ${businessDetails.contactEmail}
-- Contact Phone: ${businessDetails.contactPhone}
+The document should be ready for use after minor customization. Format the output in a clean, professional manner with proper sections and numbering.`
 
-Please generate a detailed and legally-sound ${documentType} that includes all necessary clauses and sections appropriate for this type of business and industry. Format the document professionally with clear headings and sections.`
+export async function generateDocument(
+  documentType: DocumentType,
+  formDetails: any
+): Promise<string> {
+  try {
+    // Format form details into a readable string
+    const formattedDetails = Object.entries(formDetails)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join('\n')
 
-  const completion = await openai.chat.completions.create({
-    messages: [
-      {
-        role: "system",
-        content: "You are a legal document assistant that creates professional, well-structured legal documents. Format the output in a clean, professional manner with proper sections and numbering."
-      },
-      {
-        role: "user",
-        content: prompt
-      }
-    ],
-    model: "gpt-4",
-  })
+    // Create the prompt
+    const prompt = basePrompt
+      .replace('{documentType}', documentType)
+      .replace('{formDetails}', formattedDetails)
 
-  return completion.choices[0].message.content || 'Error generating document'
+    // Call GPT-4 Turbo
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4-1106-preview', // GPT-4 Turbo model
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a legal document expert. Generate professional legal documents based on the provided details.',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 4000,
+      presence_penalty: 0.6,
+      frequency_penalty: 0.6,
+      response_format: { type: "text" },
+      top_p: 0.95,
+      stream: false,
+    })
+
+    // Extract the generated document
+    const generatedDocument = completion.choices[0]?.message?.content || ''
+
+    if (!generatedDocument) {
+      throw new Error('No document was generated')
+    }
+
+    return generatedDocument
+  } catch (error) {
+    console.error('Error generating document:', error)
+    throw new Error('Failed to generate document. Please try again.')
+  }
 } 

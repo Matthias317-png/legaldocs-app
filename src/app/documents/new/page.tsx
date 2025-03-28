@@ -10,10 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import BusinessDetailsForm from '@/components/business-details-form'
-import { BusinessDetails, DocumentType, generateDocument } from '@/lib/openai'
-import { supabase } from '@/lib/supabase-client'
+import { DocumentType, generateDocument } from '@/lib/openai'
+import { createDocument, type Document } from '@/lib/supabase-client'
 import { toast } from 'sonner'
+import NDAForm from '@/components/forms/nda-form'
+import EmploymentContractForm from '@/components/forms/employment-contract-form'
+import ServiceAgreementForm from '@/components/forms/service-agreement-form'
+import PrivacyPolicyForm from '@/components/forms/privacy-policy-form'
+import TermsOfServiceForm from '@/components/forms/terms-of-service-form'
+import { Loader2 } from 'lucide-react'
+import { useAuth } from '@/hooks/use-auth'
 
 // Explicitly define the DocumentType
 const documentTypes = [
@@ -26,9 +32,10 @@ const documentTypes = [
 
 export default function NewDocument() {
   const router = useRouter()
-  // Fix the useState typing by removing the generic type argument
+  const { user } = useAuth()
   const [selectedType, setSelectedType] = useState('')
   const [showForm, setShowForm] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
 
   const handleDocumentTypeSelect = (type: string) => {
     if (documentTypes.includes(type as DocumentType)) {
@@ -37,39 +44,58 @@ export default function NewDocument() {
     }
   }
 
-  const handleSubmit = async (details: BusinessDetails) => {
+  const handleSubmit = async (details: any) => {
     try {
+      setIsGenerating(true)
+      
       if (!documentTypes.includes(selectedType as DocumentType)) {
         throw new Error('Invalid document type selected')
+      }
+
+      if (!user) {
+        throw new Error('You must be logged in to create a document')
       }
 
       // Generate document using OpenAI
       const content = await generateDocument(selectedType as DocumentType, details)
 
-      // Save to Supabase
-      const { data, error } = await supabase
-        .from('documents')
-        .insert([
-          {
-            title: `${details.businessName} - ${selectedType}`,
-            content,
-            type: selectedType as DocumentType,
-            status: 'draft',
-            business_details: details,
-          },
-        ])
-        .select()
-
-      if (error) throw error
+      // Create document in Supabase
+      const document = await createDocument({
+        title: `${details.businessName || 'Untitled'} - ${selectedType}`,
+        content,
+        type: selectedType as DocumentType,
+        status: 'draft',
+        business_details: details,
+        user_id: user.id,
+      })
 
       // Navigate to the edit page for the new document
-      if (data?.[0]?.id) {
-        router.push(`/documents/${data[0].id}/edit`)
+      if (document?.id) {
+        router.push(`/documents/${document.id}/edit`)
         toast.success('Document created successfully')
       }
     } catch (error) {
       console.error('Error creating document:', error)
       toast.error('Failed to create document. Please try again.')
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const renderForm = () => {
+    switch (selectedType) {
+      case 'Non-Disclosure Agreement':
+        return <NDAForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      case 'Employment Contract':
+        return <EmploymentContractForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      case 'Service Agreement':
+        return <ServiceAgreementForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      case 'Privacy Policy':
+        return <PrivacyPolicyForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      case 'Terms of Service':
+        return <TermsOfServiceForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      default:
+        return null
     }
   }
 
@@ -114,13 +140,11 @@ export default function NewDocument() {
                   setShowForm(false)
                   setSelectedType('')
                 }}
+                disabled={isGenerating}
               >
                 ← Back to Document Types
               </Button>
-              <BusinessDetailsForm
-                documentType={selectedType as DocumentType}
-                onSubmit={handleSubmit}
-              />
+              {renderForm()}
             </>
           )}
         </div>

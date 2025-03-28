@@ -4,6 +4,7 @@ import React from 'react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import PricingCard from './pricing-card'
+import type { PricingCardProps } from './pricing-card'
 import ComparisonTable from '@/components/comparison-table'
 
 const pricingTiers = [
@@ -73,8 +74,16 @@ export default function PricingSection() {
           <ComparisonTable />
         ) : (
           <div className="grid md:grid-cols-3 gap-8">
-            {pricingTiers.map((tier) => (
-              <PricingCard key={tier.name} {...tier} />
+            {pricingTiers.map(tier => (
+              <div key={tier.name}>
+                <PricingCard
+                  name={tier.name}
+                  price={tier.price}
+                  description={tier.description}
+                  features={tier.features}
+                  popular={tier.popular}
+                />
+              </div>
             ))}
           </div>
         )}

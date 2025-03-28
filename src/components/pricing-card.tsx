@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Check } from 'lucide-react'
 
-interface PricingCardProps {
+export interface PricingCardProps {
   name: string
   price: number
   description: string

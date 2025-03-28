@@ -1,132 +1,98 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import React from 'react'
+import { DocumentTemplateCard } from '@/components/document-template-card'
 import { Input } from '@/components/ui/input'
-import { FileText, Search } from 'lucide-react'
-import DocumentCard from '@/components/document-card'
+import { Search } from 'lucide-react'
+import { DocumentType } from '@/lib/openai'
 
-const templates = [
+const documentTypes: Array<{
+  title: string
+  type: DocumentType
+  category: string
+}> = [
   {
     title: 'Non-Disclosure Agreement',
-    type: 'Confidentiality',
-    lastModified: '2024-02-20',
-    status: 'final' as const,
+    type: 'Non-Disclosure Agreement',
+    category: 'Confidentiality'
   },
   {
     title: 'Employment Contract',
-    type: 'Employment',
-    lastModified: '2024-02-19',
-    status: 'final' as const,
+    type: 'Employment Contract',
+    category: 'Employment'
   },
   {
     title: 'Service Agreement',
-    type: 'Business',
-    lastModified: '2024-02-18',
-    status: 'final' as const,
-  },
-  {
-    title: 'Website Terms of Service',
-    type: 'Website Legal',
-    lastModified: '2024-02-17',
-    status: 'final' as const,
+    type: 'Service Agreement',
+    category: 'Business'
   },
   {
     title: 'Privacy Policy',
-    type: 'Website Legal',
-    lastModified: '2024-02-16',
-    status: 'final' as const,
+    type: 'Privacy Policy',
+    category: 'Website Legal'
   },
   {
-    title: 'Partnership Agreement',
-    type: 'Business',
-    lastModified: '2024-02-15',
-    status: 'final' as const,
-  },
-]
-
-const categories = [
-  'All',
-  'Business',
-  'Employment',
-  'Website Legal',
-  'Confidentiality',
-  'Property',
-  'Financial',
+    title: 'Terms of Service',
+    type: 'Terms of Service',
+    category: 'Website Legal'
+  }
 ]
 
 export default function TemplatesPage() {
-  const [selectedCategory, setSelectedCategory] = useState('All')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = React.useState('')
+  const [selectedCategory, setSelectedCategory] = React.useState('All')
 
-  const filteredTemplates = templates.filter((template) => {
-    const matchesCategory = selectedCategory === 'All' || template.type === selectedCategory
-    const matchesSearch = template.title.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesCategory && matchesSearch
+  const filteredDocuments = documentTypes.filter((doc) => {
+    const matchesSearch = doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.category.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCategory = selectedCategory === 'All' || doc.category === selectedCategory
+    return matchesSearch && matchesCategory
   })
 
+  const categories = ['All', ...new Set(documentTypes.map((doc) => doc.category))]
+
   return (
-    <div className="py-12">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Document Templates</h1>
+    <div className="container py-8">
+      <h1 className="text-3xl font-bold mb-8">Document Templates</h1>
 
-          {/* Search and Filter */}
-          <div className="mb-8">
-            <div className="flex gap-4 mb-6">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="Search templates..."
-                  className="pl-10"
-                  value={searchQuery}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Templates Grid */}
-          <div className="grid gap-6">
-            {filteredTemplates.length > 0 ? (
-              filteredTemplates.map((template) => {
-                const { title, ...rest } = template
-                return (
-                  <DocumentCard
-                    key={title}
-                    title={title}
-                    {...rest}
-                    onEdit={() => {}}
-                    onDownload={() => {}}
-                    onDelete={() => {}}
-                  />
-                )
-              })
-            ) : (
-              <div className="text-center py-12">
-                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No templates found</h3>
-                <p className="text-gray-600">
-                  Try adjusting your search or filter to find what you&apos;re looking for.
-                </p>
-              </div>
-            )}
-          </div>
+      <div className="flex gap-4 mb-8">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Input
+            type="search"
+            placeholder="Search templates..."
+            className="pl-10"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
+      </div>
+
+      <div className="flex gap-2 mb-6">
+        {categories.map((category) => (
+          <button
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            className={`px-4 py-2 rounded-full text-sm ${
+              selectedCategory === category
+                ? 'bg-primary text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {filteredDocuments.map((doc) => (
+          <DocumentTemplateCard
+            key={doc.type}
+            title={doc.title}
+            category={doc.category}
+            type={doc.type}
+          />
+        ))}
       </div>
     </div>
   )
