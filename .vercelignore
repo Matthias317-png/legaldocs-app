@@ -1,0 +1,30 @@
+# Windows system directories
+AppData/
+Local/
+Temp/
+Windows/
+
+# Node modules
+node_modules/
+
+# Build outputs
+.next/
+out/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE files
+.vscode/
+.idea/
+
+# Git files
+.git/
+.gitignore
+
+# Cache directories
+.cache/
+.npm/
+.yarn/ 

@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  documents     Document[]
+  subscriptions Subscription[]
+  stripeCustomerId String?
+}
+
+model Document {
+  id          String    @id @default(cuid())
+  title       String
+  content     String
+  type        DocumentType
+  status      DocumentStatus @default(DRAFT)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  metadata    Json?
+}
+
+model Subscription {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  stripePriceId String
+  stripeSubscriptionId String?
+  status        SubscriptionStatus @default(ACTIVE)
+  plan          SubscriptionPlan
+  startDate     DateTime  @default(now())
+  endDate       DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum DocumentType {
+  NDA
+  TERMS_OF_SERVICE
+  PRIVACY_POLICY
+  FREELANCE_CONTRACT
+  EMPLOYMENT_AGREEMENT
+  PARTNERSHIP_AGREEMENT
+}
+
+enum DocumentStatus {
+  DRAFT
+  COMPLETED
+  ARCHIVED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+}
+
+enum SubscriptionPlan {
+  BASIC
+  PROFESSIONAL
+  ENTERPRISE
+} 
