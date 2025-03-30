@@ -1,10 +1,38 @@
 'use client'
 
+import React from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { FileText, Edit, Download } from 'lucide-react'
-import StepCard from '@/components/step-card'
+import { Card, CardContent } from '@/components/ui/card'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { Badge } from '@/components/ui/badge'
+import { CheckCircle, Download, Edit, FileText, MapPin, Shield } from 'lucide-react'
+import Header from '@/components/header'
+import Footer from '@/components/footer'
+import PricingCard from '@/components/pricing-card'
+import { DocumentCard } from '@/components/document-card'
 import TestimonialCard from '@/components/testimonial-card'
+import StepCard from '@/components/step-card'
+import ComparisonTable from '@/components/comparison-table'
+import DocumentPreview from '@/components/document-preview'
+import { motion } from 'framer-motion'
+import PricingSection from '@/components/pricing-section'
+import Testimonials from '@/components/testimonials'
+import StepByStepGuide from '@/components/step-by-step-guide'
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5 }
+}
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+}
 
 const steps = [
   {
@@ -56,97 +84,101 @@ const testimonials = [
 
 export default function Home() {
   return (
-    <div>
+    <div className="min-h-screen">
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-b from-blue-50 to-white">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Professional Legal Documents in Minutes
-            </h1>
-            <p className="text-xl text-gray-600 mb-8">
-              Create, customize, and download legally-sound documents with our easy-to-use platform.
-            </p>
-            <div className="flex justify-center gap-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-5xl font-bold mb-6"
+            >
+              Generate Legal Documents with AI
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-xl text-gray-600 mb-8"
+            >
+              Create professional legal documents in minutes. Our AI-powered platform helps you generate accurate and legally sound documents tailored to your needs.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="flex gap-4 justify-center"
+            >
               <Link href="/templates">
-                <Button size="lg">Get Started</Button>
+                <Button size="lg">Browse Templates</Button>
               </Link>
-              <Link href="/pricing">
-                <Button variant="outline" size="lg">View Pricing</Button>
+              <Link href="/documents/new">
+                <Button size="lg" variant="outline">Create Document</Button>
               </Link>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20">
+      {/* Features Section */}
+      <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
           <div className="grid md:grid-cols-3 gap-8">
-            {steps.map((step) => (
-              <StepCard key={step.number} {...step} />
-            ))}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center"
+            >
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Fast & Efficient</h3>
+              <p className="text-gray-600">Generate professional legal documents in minutes, not hours.</p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-center"
+            >
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Legally Sound</h3>
+              <p className="text-gray-600">Our AI ensures your documents are accurate and up-to-date with current laws.</p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="text-center"
+            >
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Easy Updates</h3>
+              <p className="text-gray-600">Modify and update your documents anytime with our intuitive interface.</p>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Choose LegalDocs</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <FileText className="h-12 w-12 text-blue-600 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Professional Templates</h3>
-              <p className="text-gray-600">
-                Access a wide range of legally-sound document templates crafted by experienced lawyers.
-              </p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <Edit className="h-12 w-12 text-blue-600 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Easy Customization</h3>
-              <p className="text-gray-600">
-                Customize your documents with our user-friendly interface and guided process.
-              </p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <Download className="h-12 w-12 text-blue-600 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Instant Download</h3>
-              <p className="text-gray-600">
-                Get your completed documents instantly in multiple formats (PDF, Word, etc.).
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">What Our Clients Say</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial) => (
-              <TestimonialCard key={testimonial.name} {...testimonial} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 bg-blue-600 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">Ready to Get Started?</h2>
-          <p className="text-xl mb-8 opacity-90">
-            Join thousands of satisfied customers who trust LegalDocs for their legal document needs.
-          </p>
-          <Link href="/register">
-            <Button size="lg" variant="secondary">
-              Create Your First Document
-            </Button>
-          </Link>
-        </div>
-      </section>
+      <StepByStepGuide />
+      <Testimonials />
+      <PricingSection />
+      <Footer />
     </div>
   )
 } 

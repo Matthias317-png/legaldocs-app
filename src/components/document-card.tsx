@@ -1,120 +1,144 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
+import { motion } from 'framer-motion'
+import { formatDistanceToNow } from 'date-fns'
+import { MoreVertical, Download, Edit, Trash2, Plus } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Pencil, Download, Trash2 } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { DocumentType } from '@/lib/openai'
-import { Textarea } from '@/components/ui/textarea'
+import { useRouter } from 'next/navigation'
 
-interface DocumentCardProps {
-  id: string
+interface BaseDocumentCardProps {
   title: string
-  category: string
   type: DocumentType
-  content: string
-  lastModified: string
-  status: 'Draft' | 'Final'
-  onUpdate: (id: string, content: string) => Promise<void>
-  onDelete: (id: string) => Promise<void>
-  onDownload: (id: string) => Promise<void>
+  category: string
+  description: string
+  onClick: () => void
+  loading?: boolean
 }
 
-export function DocumentCard({
-  id,
-  title,
-  category,
-  type,
-  content,
-  lastModified,
-  status,
-  onUpdate,
-  onDelete,
-  onDownload
-}: DocumentCardProps) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [editedContent, setEditedContent] = useState(content)
-  const [isLoading, setIsLoading] = useState(false)
+interface DocumentViewProps extends BaseDocumentCardProps {
+  id: string
+  content: string
+  lastModified: string
+  status: 'draft' | 'completed'
+  onUpdate: (id: string, content: string) => void
+  onDelete: (id: string) => void
+  onDownload: (id: string) => void
+}
 
-  const handleEdit = () => {
-    setIsEditing(true)
-  }
+interface TemplateViewProps extends BaseDocumentCardProps {
+  isTemplate: true
+}
 
-  const handleDone = async () => {
-    setIsLoading(true)
-    try {
-      await onUpdate(id, editedContent)
-      setIsEditing(false)
-    } catch (error) {
-      console.error('Error updating document:', error)
-    } finally {
-      setIsLoading(false)
+type DocumentCardProps = DocumentViewProps | TemplateViewProps
+
+function isDocumentView(props: DocumentCardProps): props is DocumentViewProps {
+  return !('isTemplate' in props)
+}
+
+function formatDate(dateString: string): string {
+  try {
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) {
+      return 'Invalid date'
     }
+    return formatDistanceToNow(date)
+  } catch (error) {
+    return 'Invalid date'
   }
+}
 
-  const handleDownload = async () => {
-    try {
-      await onDownload(id)
-    } catch (error) {
-      console.error('Error downloading document:', error)
-    }
-  }
+export function DocumentCard(props: DocumentCardProps) {
+  const router = useRouter()
+  const isTemplate = 'isTemplate' in props && props.isTemplate
 
-  const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this document?')) {
-      try {
-        await onDelete(id)
-      } catch (error) {
-        console.error('Error deleting document:', error)
-      }
+  const handleCreateDocument = () => {
+    if (isTemplate) {
+      const encodedType = encodeURIComponent(props.type)
+      router.push(`/documents/new?type=${encodedType}`)
+    } else {
+      props.onClick()
     }
   }
 
   return (
-    <Card className="relative">
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle>{title}</CardTitle>
-            <p className="text-sm text-gray-500">{category}</p>
-            <p className="text-sm text-gray-500">Last modified: {lastModified}</p>
-            <span className={`inline-block px-2 py-1 text-xs rounded ${
-              status === 'Final' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-            }`}>
-              {status}
-            </span>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold mb-2">{props.title}</h3>
+          <div className="flex items-center gap-2 mb-2">
+            <Badge variant="secondary">{props.type}</Badge>
+            <Badge variant="outline">{props.category}</Badge>
+            {!isTemplate && isDocumentView(props) && (
+              <Badge variant={props.status === 'completed' ? 'default' : 'secondary'}>
+                {props.status}
+              </Badge>
+            )}
           </div>
-          <div className="flex gap-2">
-            <Button onClick={handleEdit} variant="ghost" size="icon">
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Button onClick={handleDownload} variant="ghost" size="icon">
-              <Download className="h-4 w-4" />
-            </Button>
-            <Button onClick={handleDelete} variant="ghost" size="icon">
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
+          <p className="text-gray-600 text-sm">{props.description}</p>
+          {!isTemplate && isDocumentView(props) && (
+            <p className="text-sm text-gray-600 mt-2">
+              Last modified {formatDate(props.lastModified)} ago
+            </p>
+          )}
         </div>
-      </CardHeader>
-      <CardContent>
-        {isEditing ? (
-          <div className="space-y-4">
-            <Textarea
-              value={editedContent}
-              onChange={(e) => setEditedContent(e.target.value)}
-              className="min-h-[200px]"
-            />
-            <Button onClick={handleDone} disabled={isLoading}>
-              {isLoading ? 'Saving...' : 'Done'}
+
+        {!isTemplate && isDocumentView(props) ? (
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => props.onDownload(props.id)}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => props.onUpdate(props.id, props.content)}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => props.onDelete(props.id)} className="text-red-600">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleCreateDocument}
+              disabled={props.loading}
+              className="ml-4"
+            >
+              <Plus className="h-5 w-5" />
             </Button>
-          </div>
+          </>
         ) : (
-          <div className="prose max-w-none">
-            <p className="line-clamp-3">{content}</p>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleCreateDocument}
+            disabled={props.loading}
+          >
+            <Plus className="h-5 w-5" />
+          </Button>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </motion.div>
   )
 } 

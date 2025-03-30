@@ -1,16 +1,15 @@
-import { Inter } from 'next/font/google'
 import './globals.css'
-import Header from '@/components/header'
-import Footer from '@/components/footer'
+import { Inter } from 'next/font/google'
 import type { Metadata } from 'next'
 import Providers from '@/components/providers'
-import ToasterProvider from '@/components/toaster'
+import ClientLayout from '@/components/client-layout'
+import React from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'LegalDocs - Professional Legal Document Creation',
-  description: 'Create, customize, and download legal documents with ease.',
+  title: 'Legal Document Generator',
+  description: 'Generate professional legal documents with AI assistance',
 }
 
 export default function RootLayout({
@@ -22,10 +21,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          <Header />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
-          <ToasterProvider />
+          <ClientLayout>
+            {children}
+          </ClientLayout>
         </Providers>
       </body>
     </html>

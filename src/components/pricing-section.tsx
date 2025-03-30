@@ -4,10 +4,17 @@ import React from 'react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import PricingCard from './pricing-card'
-import type { PricingCardProps } from './pricing-card'
 import ComparisonTable from '@/components/comparison-table'
 
-const pricingTiers = [
+interface PricingTier {
+  name: string
+  price: number
+  description: string
+  features: string[]
+  popular?: boolean
+}
+
+const pricingTiers: PricingTier[] = [
   {
     name: 'Basic',
     price: 29,

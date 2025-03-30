@@ -22,7 +22,7 @@ interface BaseFormProps {
 }
 
 export default function BaseForm({ onSubmit, submitLabel = 'Continue' }: BaseFormProps) {
-  const [formData, setFormData] = React.useState<BaseFormData>({
+  const [formData, setFormData] = React.useState({
     businessName: '',
     businessAddress: '',
     businessEmail: '',
@@ -37,6 +37,16 @@ export default function BaseForm({ onSubmit, submitLabel = 'Continue' }: BaseFor
     await onSubmit(formData)
   }
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target
+    setFormData((prev: BaseFormData) => ({ ...prev, [id]: value }))
+  }
+
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { id, value } = e.target
+    setFormData((prev: BaseFormData) => ({ ...prev, [id]: value }))
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
@@ -45,7 +55,7 @@ export default function BaseForm({ onSubmit, submitLabel = 'Continue' }: BaseFor
           <Input
             id="businessName"
             value={formData.businessName}
-            onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
+            onChange={handleInputChange}
             required
           />
         </div>
@@ -55,7 +65,7 @@ export default function BaseForm({ onSubmit, submitLabel = 'Continue' }: BaseFor
           <Textarea
             id="businessAddress"
             value={formData.businessAddress}
-            onChange={(e) => setFormData({ ...formData, businessAddress: e.target.value })}
+            onChange={handleTextareaChange}
             required
           />
         </div>
@@ -66,7 +76,7 @@ export default function BaseForm({ onSubmit, submitLabel = 'Continue' }: BaseFor
             id="businessEmail"
             type="email"
             value={formData.businessEmail}
-            onChange={(e) => setFormData({ ...formData, businessEmail: e.target.value })}
+            onChange={handleInputChange}
             required
           />
         </div>
@@ -77,7 +87,7 @@ export default function BaseForm({ onSubmit, submitLabel = 'Continue' }: BaseFor
             id="businessPhone"
             type="tel"
             value={formData.businessPhone}
-            onChange={(e) => setFormData({ ...formData, businessPhone: e.target.value })}
+            onChange={handleInputChange}
             required
           />
         </div>
@@ -88,7 +98,7 @@ export default function BaseForm({ onSubmit, submitLabel = 'Continue' }: BaseFor
             id="businessWebsite"
             type="url"
             value={formData.businessWebsite}
-            onChange={(e) => setFormData({ ...formData, businessWebsite: e.target.value })}
+            onChange={handleInputChange}
           />
         </div>
 
@@ -97,7 +107,7 @@ export default function BaseForm({ onSubmit, submitLabel = 'Continue' }: BaseFor
           <Input
             id="businessRegistrationNumber"
             value={formData.businessRegistrationNumber}
-            onChange={(e) => setFormData({ ...formData, businessRegistrationNumber: e.target.value })}
+            onChange={handleInputChange}
           />
         </div>
 
@@ -106,7 +116,7 @@ export default function BaseForm({ onSubmit, submitLabel = 'Continue' }: BaseFor
           <Input
             id="businessTaxId"
             value={formData.businessTaxId}
-            onChange={(e) => setFormData({ ...formData, businessTaxId: e.target.value })}
+            onChange={handleInputChange}
           />
         </div>
       </div>

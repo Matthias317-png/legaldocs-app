@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -11,31 +11,74 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { DocumentType, generateDocument } from '@/lib/openai'
-import { createDocument, type Document } from '@/lib/supabase-client'
+import { createDocument } from '@/lib/supabase-client'
 import { toast } from 'sonner'
-import NDAForm from '@/components/forms/nda-form'
-import EmploymentContractForm from '@/components/forms/employment-contract-form'
-import ServiceAgreementForm from '@/components/forms/service-agreement-form'
-import PrivacyPolicyForm from '@/components/forms/privacy-policy-form'
-import TermsOfServiceForm from '@/components/forms/terms-of-service-form'
+import NDAForm, { NDAFormData } from '@/components/forms/nda-form'
+import EmploymentContractForm, { EmploymentContractFormData } from '@/components/forms/employment-contract-form'
+import ServiceAgreementForm, { ServiceAgreementFormData } from '@/components/forms/service-agreement-form'
+import PrivacyPolicyForm, { PrivacyPolicyFormData } from '@/components/forms/privacy-policy-form'
+import TermsOfServiceForm, { TermsOfServiceFormData } from '@/components/forms/terms-of-service-form'
+import LeaseAgreementForm, { LeaseAgreementFormData } from '@/components/forms/lease-agreement-form'
+import IPAssignmentForm, { IPAssignmentFormData } from '@/components/forms/ip-assignment-form'
+import IndependentContractorForm, { IndependentContractorFormData } from '@/components/forms/independent-contractor-form'
+import SoftwareLicenseForm, { SoftwareLicenseFormData } from '@/components/forms/software-license-form'
+import PartnershipForm, { PartnershipFormData } from '@/components/forms/partnership-form'
+import WillForm, { WillFormData } from '@/components/forms/will-form'
+import PowerOfAttorneyForm, { PowerOfAttorneyFormData } from '@/components/forms/power-of-attorney-form'
+import CommercialLoanForm, { CommercialLoanFormData } from '@/components/forms/commercial-loan-form'
+import ChildCustodyForm, { ChildCustodyFormData } from '@/components/forms/child-custody-form'
+import CeaseAndDesistForm, { CeaseAndDesistFormData } from '@/components/forms/cease-and-desist-form'
 import { Loader2 } from 'lucide-react'
-import { useAuth } from '@/hooks/use-auth'
 
-// Explicitly define the DocumentType
 const documentTypes = [
   'Non-Disclosure Agreement',
   'Employment Contract',
   'Service Agreement',
   'Privacy Policy',
   'Terms of Service',
+  'Lease Agreement',
+  'Intellectual Property Assignment',
+  'Independent Contractor Agreement',
+  'Software License Agreement',
+  'Partnership Agreement',
+  'Last Will and Testament',
+  'Power of Attorney',
+  'Commercial Loan Agreement',
+  'Child Custody Agreement',
+  'Cease and Desist Letter',
 ] as const
 
-export default function NewDocument() {
+type FormData = 
+  | NDAFormData 
+  | EmploymentContractFormData 
+  | ServiceAgreementFormData 
+  | PrivacyPolicyFormData 
+  | TermsOfServiceFormData
+  | LeaseAgreementFormData
+  | IPAssignmentFormData
+  | IndependentContractorFormData
+  | SoftwareLicenseFormData
+  | PartnershipFormData
+  | WillFormData
+  | PowerOfAttorneyFormData
+  | CommercialLoanFormData
+  | ChildCustodyFormData
+  | CeaseAndDesistFormData
+
+function NewDocumentContent() {
   const router = useRouter()
-  const { user } = useAuth()
+  const searchParams = useSearchParams()
   const [selectedType, setSelectedType] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
+
+  useEffect(() => {
+    const typeFromUrl = searchParams.get('type')
+    if (typeFromUrl && documentTypes.includes(typeFromUrl as DocumentType)) {
+      setSelectedType(typeFromUrl)
+      setShowForm(true)
+    }
+  }, [searchParams])
 
   const handleDocumentTypeSelect = (type: string) => {
     if (documentTypes.includes(type as DocumentType)) {
@@ -44,7 +87,7 @@ export default function NewDocument() {
     }
   }
 
-  const handleSubmit = async (details: any) => {
+  const handleSubmit = async (details: FormData) => {
     try {
       setIsGenerating(true)
       
@@ -52,24 +95,17 @@ export default function NewDocument() {
         throw new Error('Invalid document type selected')
       }
 
-      if (!user) {
-        throw new Error('You must be logged in to create a document')
-      }
-
-      // Generate document using OpenAI
       const content = await generateDocument(selectedType as DocumentType, details)
 
-      // Create document in Supabase
       const document = await createDocument({
         title: `${details.businessName || 'Untitled'} - ${selectedType}`,
         content,
         type: selectedType as DocumentType,
         status: 'draft',
         business_details: details,
-        user_id: user.id,
+        user_id: 'anonymous'
       })
 
-      // Navigate to the edit page for the new document
       if (document?.id) {
         router.push(`/documents/${document.id}/edit`)
         toast.success('Document created successfully')
@@ -94,6 +130,26 @@ export default function NewDocument() {
         return <PrivacyPolicyForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
       case 'Terms of Service':
         return <TermsOfServiceForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      case 'Lease Agreement':
+        return <LeaseAgreementForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      case 'Intellectual Property Assignment':
+        return <IPAssignmentForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      case 'Independent Contractor Agreement':
+        return <IndependentContractorForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      case 'Software License Agreement':
+        return <SoftwareLicenseForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      case 'Partnership Agreement':
+        return <PartnershipForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      case 'Last Will and Testament':
+        return <WillForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      case 'Power of Attorney':
+        return <PowerOfAttorneyForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      case 'Commercial Loan Agreement':
+        return <CommercialLoanForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      case 'Child Custody Agreement':
+        return <ChildCustodyForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
+      case 'Cease and Desist Letter':
+        return <CeaseAndDesistForm onSubmit={handleSubmit} isSubmitting={isGenerating} />
       default:
         return null
     }
@@ -150,5 +206,13 @@ export default function NewDocument() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function NewDocument() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NewDocumentContent />
+    </Suspense>
   )
 } 

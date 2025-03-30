@@ -105,21 +105,27 @@ export default function DocumentsPage() {
         <div className="text-center py-12">Loading...</div>
       ) : filteredDocuments.length > 0 ? (
         <div className="grid gap-6">
-          {filteredDocuments.map((doc: Document) => (
-            <DocumentCard
-              key={doc.id}
-              id={doc.id}
-              title={doc.title}
-              type={doc.type}
-              content={doc.content}
-              category={doc.category}
-              lastModified={doc.lastModified}
-              status={doc.status as 'Draft' | 'Final'}
-              onUpdate={handleUpdate}
-              onDelete={handleDelete}
-              onDownload={handleDownload}
-            />
-          ))}
+          {filteredDocuments.map((doc: Document) => {
+            const { id, title, type, content, category, lastModified, status } = doc;
+            return (
+              <div key={doc.id}>
+                <DocumentCard
+                  id={id}
+                  title={title}
+                  type={type}
+                  content={content}
+                  category={category}
+                  description={title}
+                  lastModified={lastModified}
+                  status={status.toLowerCase() as 'draft' | 'completed'}
+                  onUpdate={handleUpdate}
+                  onDelete={handleDelete}
+                  onDownload={handleDownload}
+                  onClick={() => {}}
+                />
+              </div>
+            );
+          })}
         </div>
       ) : (
         <div className="text-center py-12">

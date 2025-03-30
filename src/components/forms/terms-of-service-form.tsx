@@ -52,7 +52,7 @@ export default function TermsOfServiceForm({
   onSubmit, 
   isSubmitting = false 
 }: TermsOfServiceFormProps) {
-  const [formData, setFormData] = useState<TermsOfServiceFormData>(initialFormData)
+  const [formData, setFormData] = useState(initialFormData as TermsOfServiceFormData)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

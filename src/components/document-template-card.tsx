@@ -1,40 +1,45 @@
+'use client'
+
 import React from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Plus } from 'lucide-react'
 import { DocumentType } from '@/lib/openai'
 
 interface DocumentTemplateCardProps {
   title: string
   category: string
   type: DocumentType
-  lastModified?: string
 }
 
-export function DocumentTemplateCard({ title, category, type, lastModified }: DocumentTemplateCardProps) {
+export function DocumentTemplateCard({ title, category, type }: DocumentTemplateCardProps) {
   const router = useRouter()
 
-  const handleCreate = () => {
-    router.push(`/documents/new?type=${type}`)
+  const handleCreateDocument = () => {
+    // Navigate to the new document page with the selected type
+    router.push(`/documents/new?type=${encodeURIComponent(type)}`)
   }
 
   return (
-    <Card className="relative">
+    <Card className="relative group hover:shadow-lg transition-shadow">
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <p className="text-sm text-gray-500">{category}</p>
-      </CardHeader>
-      <CardContent>
-        <div className="flex justify-between items-center">
-          {lastModified && (
-            <p className="text-sm text-gray-500">Last modified: {lastModified}</p>
-          )}
-          <Button onClick={handleCreate} variant="ghost" size="icon">
+        <div className="flex items-start justify-between">
+          <div>
+            <CardTitle className="text-xl font-semibold">{title}</CardTitle>
+            <CardDescription className="mt-2 text-gray-600">{category}</CardDescription>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={handleCreateDocument}
+          >
             <Plus className="h-5 w-5" />
+            <span className="sr-only">Create {title}</span>
           </Button>
         </div>
-      </CardContent>
+      </CardHeader>
     </Card>
   )
 } 

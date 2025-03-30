@@ -52,7 +52,7 @@ export default function EmploymentContractForm({
   onSubmit, 
   isSubmitting = false 
 }: EmploymentContractFormProps) {
-  const [formData, setFormData] = useState<EmploymentContractFormData>(initialFormData)
+  const [formData, setFormData] = useState(initialFormData as EmploymentContractFormData)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

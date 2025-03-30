@@ -16,6 +16,21 @@ export interface NDAFormData {
   duration: string
   jurisdiction: string
   effectiveDate: string
+  returnOfMaterials: string
+  governingLaw: string
+  termination: string
+  nonDisclosure: string
+  nonUse: string
+  nonCircumvention: string
+  remedies: string
+  entireAgreement: string
+  modifications: string
+  notices: string
+  severability: string
+  waiver: string
+  assignment: string
+  survival: string
+  signatures: string
 }
 
 export interface NDAFormProps {
@@ -24,7 +39,7 @@ export interface NDAFormProps {
 }
 
 export default function NDAForm({ onSubmit, isSubmitting = false }: NDAFormProps) {
-  const [formData, setFormData] = useState<NDAFormData>({
+  const [formData, setFormData] = useState({
     businessName: '',
     disclosingParty: '',
     receivingParty: '',
@@ -33,7 +48,22 @@ export default function NDAForm({ onSubmit, isSubmitting = false }: NDAFormProps
     duration: '',
     jurisdiction: '',
     effectiveDate: new Date().toISOString().split('T')[0],
-  })
+    returnOfMaterials: '',
+    governingLaw: '',
+    termination: '',
+    nonDisclosure: '',
+    nonUse: '',
+    nonCircumvention: '',
+    remedies: '',
+    entireAgreement: '',
+    modifications: '',
+    notices: '',
+    severability: '',
+    waiver: '',
+    assignment: '',
+    survival: '',
+    signatures: '',
+  } as NDAFormData)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,7 +74,7 @@ export default function NDAForm({ onSubmit, isSubmitting = false }: NDAFormProps
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    setFormData((prev: NDAFormData) => ({ ...prev, [name]: value }))
   }
 
   return (

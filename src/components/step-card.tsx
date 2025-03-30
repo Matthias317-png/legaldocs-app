@@ -1,6 +1,7 @@
 'use client'
 
-import { Card, CardContent } from '@/components/ui/card'
+import React from 'react'
+import { motion } from 'framer-motion'
 import { FileText, Edit, Download } from 'lucide-react'
 
 interface StepCardProps {
@@ -8,38 +9,34 @@ interface StepCardProps {
   title: string
   description: string
   icon: 'FileText' | 'Edit' | 'Download'
-  key?: number | string
 }
 
-const iconMap = {
+const icons = {
   FileText,
   Edit,
   Download,
 }
 
 export default function StepCard({ number, title, description, icon }: StepCardProps) {
-  const Icon = iconMap[icon]
+  const Icon = icons[icon]
 
   return (
-    <Card className="relative">
-      <CardContent className="pt-6">
-        <div className="flex items-start gap-4">
-          <div className="flex-shrink-0">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-              <Icon className="h-6 w-6 text-blue-600" />
-            </div>
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
-                {number}
-              </span>
-              <h3 className="text-lg font-semibold">{title}</h3>
-            </div>
-            <p className="mt-2 text-gray-600">{description}</p>
-          </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow"
+    >
+      <div className="flex items-center mb-4">
+        <div className="bg-blue-100 p-3 rounded-full mr-4">
+          <Icon className="h-6 w-6 text-blue-600" />
         </div>
-      </CardContent>
-    </Card>
+        <div className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
+          {number}
+        </div>
+      </div>
+      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+      <p className="text-gray-600">{description}</p>
+    </motion.div>
   )
 } 

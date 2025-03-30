@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -42,7 +43,7 @@ export default function PrivacyPolicyForm({
   onSubmit, 
   isSubmitting = false 
 }: PrivacyPolicyFormProps) {
-  const [formData, setFormData] = useState<PrivacyPolicyFormData>(initialFormData)
+  const [formData, setFormData] = useState(initialFormData as PrivacyPolicyFormData)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

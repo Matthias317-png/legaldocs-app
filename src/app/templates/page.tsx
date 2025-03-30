@@ -1,99 +1,76 @@
 'use client'
 
 import React from 'react'
-import { DocumentTemplateCard } from '@/components/document-template-card'
-import { Input } from '@/components/ui/input'
-import { Search } from 'lucide-react'
+import { DocumentCard } from '@/components/document-card'
 import { DocumentType } from '@/lib/openai'
 
-const documentTypes: Array<{
-  title: string
-  type: DocumentType
-  category: string
-}> = [
+const templates = [
   {
+    id: 'nda',
     title: 'Non-Disclosure Agreement',
-    type: 'Non-Disclosure Agreement',
-    category: 'Confidentiality'
+    type: 'Non-Disclosure Agreement' as DocumentType,
+    category: 'Business',
+    description: 'Protect your confidential information with a professional NDA.',
+    isTemplate: true,
   },
   {
+    id: 'employment',
     title: 'Employment Contract',
-    type: 'Employment Contract',
-    category: 'Employment'
+    type: 'Employment Contract' as DocumentType,
+    category: 'Employment',
+    description: 'Create a comprehensive employment contract for your team.',
+    isTemplate: true,
   },
   {
+    id: 'service',
     title: 'Service Agreement',
-    type: 'Service Agreement',
-    category: 'Business'
+    type: 'Service Agreement' as DocumentType,
+    category: 'Business',
+    description: 'Define terms and conditions for your services.',
+    isTemplate: true,
   },
   {
+    id: 'privacy',
     title: 'Privacy Policy',
-    type: 'Privacy Policy',
-    category: 'Website Legal'
+    type: 'Privacy Policy' as DocumentType,
+    category: 'Legal',
+    description: 'Protect your business with a compliant privacy policy.',
+    isTemplate: true,
   },
   {
+    id: 'terms',
     title: 'Terms of Service',
-    type: 'Terms of Service',
-    category: 'Website Legal'
-  }
+    type: 'Terms of Service' as DocumentType,
+    category: 'Legal',
+    description: 'Set clear terms for your website or service.',
+    isTemplate: true,
+  },
 ]
 
 export default function TemplatesPage() {
-  const [searchQuery, setSearchQuery] = React.useState('')
-  const [selectedCategory, setSelectedCategory] = React.useState('All')
-
-  const filteredDocuments = documentTypes.filter((doc) => {
-    const matchesSearch = doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.category.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = selectedCategory === 'All' || doc.category === selectedCategory
-    return matchesSearch && matchesCategory
-  })
-
-  const categories = ['All', ...new Set(documentTypes.map((doc) => doc.category))]
-
   return (
-    <div className="container py-8">
-      <h1 className="text-3xl font-bold mb-8">Document Templates</h1>
-
-      <div className="flex gap-4 mb-8">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <Input
-            type="search"
-            placeholder="Search templates..."
-            className="pl-10"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Document Templates</h1>
+        <p className="text-gray-600">
+          Choose a template to create your legal document. All templates are free to use.
+        </p>
       </div>
 
-      <div className="flex gap-2 mb-6">
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={`px-4 py-2 rounded-full text-sm ${
-              selectedCategory === category
-                ? 'bg-primary text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredDocuments.map((doc) => (
-          <DocumentTemplateCard
-            key={doc.type}
-            title={doc.title}
-            category={doc.category}
-            type={doc.type}
-          />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {templates.map((template) => (
+          <div key={template.id}>
+            <DocumentCard
+              title={template.title}
+              type={template.type}
+              category={template.category}
+              description={template.description}
+              isTemplate={true}
+              onClick={() => {}}
+            />
+          </div>
         ))}
       </div>
     </div>
   )
-} 
+}

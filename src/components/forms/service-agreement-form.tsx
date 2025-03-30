@@ -52,7 +52,7 @@ export default function ServiceAgreementForm({
   onSubmit, 
   isSubmitting = false 
 }: ServiceAgreementFormProps) {
-  const [formData, setFormData] = useState<ServiceAgreementFormData>(initialFormData)
+  const [formData, setFormData] = useState(initialFormData as ServiceAgreementFormData)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
