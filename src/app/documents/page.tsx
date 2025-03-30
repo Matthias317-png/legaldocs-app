@@ -75,9 +75,15 @@ export default function DocumentsPage() {
     }
   }
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Search is handled automatically through the filteredDocuments variable
+  }
+
   const filteredDocuments = documents.filter((doc: Document) =>
     doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    doc.type.toLowerCase().includes(searchQuery.toLowerCase())
+    doc.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    doc.category.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
@@ -90,16 +96,16 @@ export default function DocumentsPage() {
         </Button>
       </div>
 
-      <div className="relative mb-8">
+      <form onSubmit={handleSearch} className="relative mb-8">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         <Input
           type="search"
           placeholder="Search documents..."
           className="pl-10"
           value={searchQuery}
-          onChange={(e: { target: { value: string } }) => setSearchQuery(e.target.value)}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
-      </div>
+      </form>
 
       {loading ? (
         <div className="text-center py-12">Loading...</div>
