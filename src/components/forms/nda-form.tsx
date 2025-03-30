@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,31 +15,15 @@ export interface NDAFormData {
   confidentialInfo: string
   duration: string
   jurisdiction: string
-  effectiveDate: string
-  returnOfMaterials: string
-  governingLaw: string
-  termination: string
-  nonDisclosure: string
-  nonUse: string
-  nonCircumvention: string
-  remedies: string
-  entireAgreement: string
-  modifications: string
-  notices: string
-  severability: string
-  waiver: string
-  assignment: string
-  survival: string
-  signatures: string
 }
 
-export interface NDAFormProps {
+interface NDAFormProps {
   onSubmit: (data: NDAFormData) => Promise<void>
-  isSubmitting?: boolean
+  isSubmitting: boolean
 }
 
-export default function NDAForm({ onSubmit, isSubmitting = false }: NDAFormProps) {
-  const [formData, setFormData] = useState({
+export default function NDAForm({ onSubmit, isSubmitting }: NDAFormProps) {
+  const [formData, setFormData] = React.useState<NDAFormData>({
     businessName: '',
     disclosingParty: '',
     receivingParty: '',
@@ -47,153 +31,107 @@ export default function NDAForm({ onSubmit, isSubmitting = false }: NDAFormProps
     confidentialInfo: '',
     duration: '',
     jurisdiction: '',
-    effectiveDate: new Date().toISOString().split('T')[0],
-    returnOfMaterials: '',
-    governingLaw: '',
-    termination: '',
-    nonDisclosure: '',
-    nonUse: '',
-    nonCircumvention: '',
-    remedies: '',
-    entireAgreement: '',
-    modifications: '',
-    notices: '',
-    severability: '',
-    waiver: '',
-    assignment: '',
-    survival: '',
-    signatures: '',
-  } as NDAFormData)
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     await onSubmit(formData)
   }
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    setFormData((prev: NDAFormData) => ({ ...prev, [name]: value }))
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Non-Disclosure Agreement Details</h2>
-        <p className="text-gray-600">
-          Fill in the details below to generate your NDA. All fields marked with an asterisk (*) are required.
-        </p>
-      </div>
-
-      <div className="space-y-4">
         <div>
-          <Label htmlFor="businessName">Business Name *</Label>
+          <Label htmlFor="businessName">Business Name</Label>
           <Input
             id="businessName"
             name="businessName"
             value={formData.businessName}
             onChange={handleChange}
             required
-            placeholder="Enter your business name"
           />
         </div>
 
         <div>
-          <Label htmlFor="disclosingParty">Disclosing Party *</Label>
+          <Label htmlFor="disclosingParty">Disclosing Party</Label>
           <Input
             id="disclosingParty"
             name="disclosingParty"
             value={formData.disclosingParty}
             onChange={handleChange}
             required
-            placeholder="Enter disclosing party name"
           />
         </div>
 
         <div>
-          <Label htmlFor="receivingParty">Receiving Party *</Label>
+          <Label htmlFor="receivingParty">Receiving Party</Label>
           <Input
             id="receivingParty"
             name="receivingParty"
             value={formData.receivingParty}
             onChange={handleChange}
             required
-            placeholder="Enter receiving party name"
           />
         </div>
 
         <div>
-          <Label htmlFor="purpose">Purpose of Disclosure *</Label>
+          <Label htmlFor="purpose">Purpose of Disclosure</Label>
           <Textarea
             id="purpose"
             name="purpose"
             value={formData.purpose}
             onChange={handleChange}
             required
-            placeholder="Describe the purpose of sharing confidential information"
-            rows={3}
           />
         </div>
 
         <div>
-          <Label htmlFor="confidentialInfo">Confidential Information *</Label>
+          <Label htmlFor="confidentialInfo">Confidential Information Description</Label>
           <Textarea
             id="confidentialInfo"
             name="confidentialInfo"
             value={formData.confidentialInfo}
             onChange={handleChange}
             required
-            placeholder="Describe what information will be considered confidential"
-            rows={3}
           />
         </div>
 
         <div>
-          <Label htmlFor="duration">Duration of Agreement *</Label>
+          <Label htmlFor="duration">Duration (e.g., "2 years")</Label>
           <Input
             id="duration"
             name="duration"
             value={formData.duration}
             onChange={handleChange}
             required
-            placeholder="e.g., 2 years"
           />
         </div>
 
         <div>
-          <Label htmlFor="jurisdiction">Governing Jurisdiction *</Label>
+          <Label htmlFor="jurisdiction">Jurisdiction</Label>
           <Input
             id="jurisdiction"
             name="jurisdiction"
             value={formData.jurisdiction}
             onChange={handleChange}
             required
-            placeholder="e.g., State of California"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="effectiveDate">Effective Date *</Label>
-          <Input
-            id="effectiveDate"
-            name="effectiveDate"
-            type="date"
-            value={formData.effectiveDate}
-            onChange={handleChange}
-            required
           />
         </div>
       </div>
 
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="w-full">
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Generating Document...
           </>
         ) : (
-          'Generate NDA'
+          'Generate Document'
         )}
       </Button>
     </form>

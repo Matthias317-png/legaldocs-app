@@ -8,9 +8,10 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 export interface Document {
   id: string
   title: string
-  type: DocumentType
   content: string
-  status: 'Draft' | 'Final'
+  type: string
+  category: string
+  metadata: Record<string, any>
   created_at: string
   updated_at: string
 }
